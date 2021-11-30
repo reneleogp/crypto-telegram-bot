@@ -11,7 +11,6 @@ headers = {
 session = requests.Session()
 session.headers.update(headers)
 
-
 def list(limit):
     parameters = {
         "currency": "USD",
@@ -26,8 +25,8 @@ def list(limit):
     return r.json()
 
 
-def single(coin):
-    parameters = {"currency": "USD", "code": coin, "meta": True}
+def single(coin, meta):
+    parameters = {"currency": "USD", "code": coin, "meta": meta}
     url = 'https://api.livecoinwatch.com/coins/single'
     r = session.post(url, data=json.dumps(parameters))
     return r.json()
@@ -54,8 +53,8 @@ def list_exchanges(limit):
     return r.json()
 
 
-def single_exchange(limit):
-    parameters = {"currency": "USD", "code": "binance", "meta": True}
+def single_exchange(exchange):
+    parameters = {"currency": "USD", "code": exchange, "meta": True}
     url = 'https://api.livecoinwatch.com/exchanges/single'
     r = session.post(url, data=json.dumps(parameters))
     return r.json()

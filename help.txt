@@ -1,10 +1,19 @@
 Commands:
-- "info coin" with no quotation marks gets the information about any coin.
+
+- "overview" with no quotation marks gets current aggregated data for all coins.
+Example: overview
+
+- "info x" with no quotation marks gets the information about any coin, where X is the code of the coin.
 Example: info BTC
 
 - "list x" with no quotation marks gets basic information about the top x coins.
 Example: list 3
 
-- "overview" with no quotation marks gets current aggregated data for all coins.
-Example: overview
+- "list exchanges x" with no quotation marks gets basic information about the top x exchanges.
+Example: list exchanges 3
 
+- "exchange x" with no quotation marks gets the information about any exchange, where X is the code of the exchange.
+Example: info coinbasepro
+
+- "price x" with no quotation marks gets the price of any coin, where X is the code of the coin.
+Example: price ETH

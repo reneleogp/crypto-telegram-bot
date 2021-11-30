@@ -13,9 +13,12 @@ trash_info = {
     "webp32",
     "webp64",
     "totalSupply",
+    "png128",
+    "webp128",
+    "uscompliant"
 }
 not_money = {
-    "pairs", "markets", "exchanges", "name", "symbol", "code", "visitors"
+    "pairs", "markets", "exchanges", "name", "symbol", "code", "visitors", "centrilized"
 }
 
 
@@ -39,7 +42,7 @@ def start(message):
 # Market overview request
 def overview_request(message):
     request = message.text.split()
-    if len(request) < 1 or request[0].lower() not in "/overview":
+    if len(request) < 1 or request[0].lower() not in "overview":
         return False
     else:
         return True
@@ -74,7 +77,7 @@ def send_overview(message):
 # Single coin detailed information request
 def coin_request(message):
     request = message.text.split()
-    if len(request) < 2 or request[0].lower() not in "info":
+    if len(request) < 2 and (request[0].lower() not in "info" or request[0].lower() not in "price"):
         return False
     else:
         return True
@@ -83,8 +86,14 @@ def coin_request(message):
 @bot.message_handler(func=coin_request)
 def send_coin_info(message):
     coin = message.text.split()[1].upper()
-    data = api_calls.single(coin)
+    if message.text.split()[0] in "info":
+      data = api_calls.single(coin, True)
+    else:
+      data = api_calls.single(coin, False)
+
+
     if 'error' in data:
+        print(data)
         bot.send_message(message.chat.id, "No data!?")
     else:
         response = ""
@@ -108,7 +117,11 @@ def list_request(message):
     if len(request) < 2 or request[0].lower() not in "list":
         return False
     else:
-        return True
+        limit = request[1]
+        if limit.isnumeric():
+            return True
+        else:
+            return False
 
 
 @bot.message_handler(func=list_request)
@@ -116,6 +129,7 @@ def send_list_info(message):
     limit = int(message.text.split()[1])
     data = api_calls.list(min(limit, 20))
     if 'error' in data:
+        print(data)
         bot.send_message(message.chat.id, "No data!?")
     else:
         response = ""
@@ -145,10 +159,14 @@ def send_list_info(message):
 def list_ex_request(message):
     request = message.text.split()
     if len(request) < 3 or request[0].lower(
-    ) not in "exchanges" or request[1].lower() not in "list":
+    ) not in "list" or request[1].lower() not in "exchanges":
         return False
     else:
-        return True
+        limit = request[2]
+        if limit.isnumeric():
+            return True
+        else:
+            return False
 
 
 @bot.message_handler(func=list_ex_request)
@@ -156,6 +174,7 @@ def send_list_ex_info(message):
     limit = int(message.text.split()[2])
     data = api_calls.list_exchanges(min(limit, 15))
     if 'error' in data:
+        print(data)
         bot.send_message(message.chat.id, "No data!?")
     else:
         response = ""
@@ -163,14 +182,14 @@ def send_list_ex_info(message):
             for val in exchange:
                 name = val.capitalize()
                 money = True
-              
+
                 if val in 'code':
                     name = "Name Code"
                 if val in 'volume':
                     name = "24H Volume"
                 if val in "visitors":
                     name = "Daily Visitors"
-            
+
                 if val in not_money:
                     money = False
 
@@ -181,11 +200,49 @@ def send_list_ex_info(message):
         bot.send_message(message.chat.id, response)
 
 
+# Single exanchange detailed information request
+def exchange_request(message):
+    request = message.text.split()
+    if len(request) < 2 or request[0].lower() not in "exchange":
+        return False
+    else:
+        return True
+
+
+@bot.message_handler(func=exchange_request)
+def send_ex_info(message):
+    exchange = message.text.split()[1].lower()
+    data = api_calls.single_exchange(exchange)
+    if 'error' in data:
+        bot.send_message(message.chat.id, "No data!?")
+    else:
+      
+        response = ""
+        for val in data:
+            name = val.capitalize()
+            money = True
+            if val in 'code':
+                name = "Name Code"
+            if val in 'volume':
+                name = "24H Volume"
+            if val in "visitors":
+                name = "Daily Visitors"
+          
+            if val.lower() in not_money:
+                money = False
+
+            if val.lower() not in trash_info:
+                response += format_line(name, data[val], money)
+
+        bot.send_message(message.chat.id, response)
+
+
 # Format value function
 def format_line(name, val, money):
     response = name + ": "
     if money:
         response += "$"
+
     if type(val) == int or type(val) == float:
         if val < 1:
             response += str(format(val, '.6f'))
