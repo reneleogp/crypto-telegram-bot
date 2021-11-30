@@ -52,6 +52,7 @@ def overview_request(message):
 def send_overview(message):
     data = api_calls.overview()
     if 'error' in data:
+        print(data)
         bot.send_message(message.chat.id, "No data!?")
     else:
         response = "Market overview.\n"
@@ -76,11 +77,12 @@ def send_overview(message):
 
 # Single coin detailed information request
 def coin_request(message):
+    
     request = message.text.split()
-    if len(request) < 2 and (request[0].lower() not in "info" or request[0].lower() not in "price"):
-        return False
-    else:
+    if len(request) >= 2 and (request[0].lower() in "price" or request[0].lower() in "info"):
         return True
+    else:
+        return False
 
 
 @bot.message_handler(func=coin_request)
@@ -90,7 +92,6 @@ def send_coin_info(message):
       data = api_calls.single(coin, True)
     else:
       data = api_calls.single(coin, False)
-
 
     if 'error' in data:
         print(data)
@@ -214,6 +215,7 @@ def send_ex_info(message):
     exchange = message.text.split()[1].lower()
     data = api_calls.single_exchange(exchange)
     if 'error' in data:
+        print(data)
         bot.send_message(message.chat.id, "No data!?")
     else:
       
