@@ -6,7 +6,10 @@ from millify import millify
 API_KEY = os.environ['API_KEY']
 bot = telebot.TeleBot(API_KEY)
 
-trash_info = {"color", "png32", "png64", "webp32", "webp64", "totalSupply", "pairs", "markets", "exchanges"}
+trash_info = {
+    "color", "png32", "png64", "webp32", "webp64", "totalSupply", "pairs",
+    "markets", "exchanges"
+}
 
 
 @bot.message_handler(commands=['help'])
@@ -70,7 +73,7 @@ def send_list_info(message):
         for coin in data:
             for val in coin:
                 if val in 'code':
-                    response += ("Name: ")
+                    response += ("Name Code: ")
                 if val in 'rate':
                     response += ("Price: ")
                 if val in 'volume':
@@ -79,6 +82,36 @@ def send_list_info(message):
                     response += ("Market Cap: ")
                 response += (format_value(coin[val]) + "\n")
             response += "\n"
+
+        bot.send_message(message.chat.id, response)
+
+
+def overview_request(message):
+    request = message.text.split()
+    if len(request) < 1 or request[0].lower() not in "overview":
+        return False
+    else:
+        return True
+
+
+@bot.message_handler(func=overview_request)
+def send_overview(message):
+    data = api_calls.overview()
+    if 'error' in data:
+        bot.send_message(message.chat.id, "No data!?")
+    else:
+        response = "Market overview.\n"
+        for val in data:
+            if val in 'btcDominance':
+                response += ("BTC Dominance: " +
+                             str(millify((data[val] * 100), precision=2) + "%\n"))
+            if val in 'volume':
+                response += ("24H Volume: " + format_value(data[val])+"\n")
+            if val in 'cap':
+                response += ("Market Cap: " + format_value(data[val])+"\n")
+            if val in 'liquidity':
+                response += ("2% liquidity : " +
+                             str(millify((data[val] * 100), precision=2) + "%\n"))    
 
         bot.send_message(message.chat.id, response)
 

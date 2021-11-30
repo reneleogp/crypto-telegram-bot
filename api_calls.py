@@ -31,3 +31,9 @@ def single(coin):
     url = 'https://api.livecoinwatch.com/coins/single'
     r = session.post(url, data=json.dumps(parameters))
     return r.json()
+
+def overview():
+    parameters = {"currency": "USD"}
+    url = 'https://api.livecoinwatch.com/overview'
+    r = session.post(url, data=json.dumps(parameters))
+    return r.json()    
