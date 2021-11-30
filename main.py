@@ -155,11 +155,21 @@ def send_list_ex_info(message):
         response = ""
         for exchange in data:
             for val in exchange:
-                if val in 'markets':
-                    response += val.capitalize() + \
-                        format_value(exchange[val], True)
-                else:
-                    response += (format_value(coin[val]) + "\n")
+                name = val.capitalize()
+                money = True
+                if val in "rate":
+                    name = "Price"
+                if val in 'code':
+                    name = "Name Code"
+                if val in 'volume':
+                    name = "24H Volume"
+                if val in 'cap':
+                    name = "Market Cap"
+                if val in not_money:
+                    money = False
+
+                if val not in trash_info:
+                    response += format_line(name, exchange[val], money)
             response += "\n"
 
         bot.send_message(message.chat.id, response)
