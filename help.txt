@@ -1,0 +1,4 @@
+Commands:
+- "info coin" with no quotation marks to get the information about any coin. Example: info BTC
+
+- "list x" with no quotation marks to get basic information about the top x coins. Example: list 3
