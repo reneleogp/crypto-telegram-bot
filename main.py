@@ -11,14 +11,14 @@ trash_info = {
     "markets", "exchanges"
 }
 
-
+# Get help
 @bot.message_handler(commands=['help'])
 def info(message):
     f = open('help.txt', 'r')
     bot.send_message(message.chat.id, f.read())
     f.close()
 
-
+# Start message
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(
@@ -26,7 +26,7 @@ def start(message):
         "Hello! Welcome to Crypto Info Bot, use /help to learn how to use the bot. Enjoy!"
     )
 
-
+# Single coin detailed information request
 def coin_request(message):
     request = message.text.split()
     if len(request) < 2 or request[0].lower() not in "info":
@@ -53,7 +53,7 @@ def send_coin_info(message):
 
         bot.send_message(message.chat.id, response)
 
-
+# Coins list information request
 def list_request(message):
     request = message.text.split()
     if len(request) < 2 or request[0].lower() not in "list":
@@ -85,7 +85,7 @@ def send_list_info(message):
 
         bot.send_message(message.chat.id, response)
 
-
+# Market overview request
 def overview_request(message):
     request = message.text.split()
     if len(request) < 1 or request[0].lower() not in "overview":
@@ -116,14 +116,47 @@ def send_overview(message):
         bot.send_message(message.chat.id, response)
 
 
-def format_value(val):
+# Exchanges list information request
+def list_ex_request(message):
+    request = message.text.split()
+    if len(request) < 3 or request[0].lower() not in "exchanges" or request[1].lower() not in "list":
+        return False
+    else:
+        return True
+
+
+@bot.message_handler(func=list_ex_request)
+def send_list_ex_info(message):
+    limit = int(message.text.split()[2])
+    data = api_calls.list_exchanges(min(limit, 15))
+    if 'error' in data:
+        bot.send_message(message.chat.id, "No data!?")
+    else:
+        response = ""
+        for exchange in data:
+            for val in exchange:
+                if val in 'markets':
+                    response += val.capitalize() + format_value(exchange[val], True)
+                else:
+                    response += (format_value(coin[val]) + "\n")
+            response += "\n"
+
+        bot.send_message(message.chat.id, response)
+
+
+# Format value function
+def format_value(val, money):
+    response = ""
+    if money:
+        response = "$"
     if type(val) == int or type(val) == float:
         if val < 1:
-            return "$" + str(format(val, '.6f'))
+            response += str(format(val, '.6f'))
         else:
-            return "$" + str(millify(val, precision=2))
+            response += str(millify(val, precision=2))
     else:
-        return str(val)
+        response += str(val)
+    return response + "\n"
 
 
 bot.polling()
