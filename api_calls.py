@@ -36,4 +36,28 @@ def overview():
     parameters = {"currency": "USD"}
     url = 'https://api.livecoinwatch.com/overview'
     r = session.post(url, data=json.dumps(parameters))
-    return r.json()    
+    return r.json()
+
+
+def list_exchanges(limit):
+    parameters = {
+	"currency": "USD",
+	"sort": "volume",
+	"order": "descending",
+	"offset": 0,
+	"limit": limit,
+	"meta": False
+    }
+    url = 'https://api.livecoinwatch.com/exchanges/list'
+    r = session.post(url, data=json.dumps(parameters))
+    return r.json()
+
+def single_exchange(limit):
+    parameters = {
+	"currency": "USD",
+	"code": "binance",
+	"meta": True
+    }
+    url = 'https://api.livecoinwatch.com/exchanges/single'
+    r = session.post(url, data=json.dumps(parameters))
+    return r.json()
