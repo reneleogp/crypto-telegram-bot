@@ -7,11 +7,16 @@ API_KEY = os.environ['API_KEY']
 bot = telebot.TeleBot(API_KEY)
 
 trash_info = {
-    "color", "png32", "png64", "webp32", "webp64", "totalSupply", "pairs",
+    "color", "png32", "png64", "webp32", "webp64", "totalSupply",
+}
+not_money = {
+    "pairs",
     "markets", "exchanges"
 }
 
 # Get help
+
+
 @bot.message_handler(commands=['help'])
 def info(message):
     f = open('help.txt', 'r')
@@ -19,6 +24,8 @@ def info(message):
     f.close()
 
 # Start message
+
+
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(
@@ -27,6 +34,8 @@ def start(message):
     )
 
 # Single coin detailed information request
+
+
 def coin_request(message):
     request = message.text.split()
     if len(request) < 2 or request[0].lower() not in "info":
@@ -43,17 +52,21 @@ def send_coin_info(message):
         bot.send_message(message.chat.id, "No data!?")
     else:
         response = ""
-
         for val in data:
+            name = val.capitalize(), money = True
             if val in "rate":
-                response += ("Price: " + format_value(data[val]) + "\n")
-            elif val not in trash_info:
-                response += (val.capitalize() + ": " +
-                             format_value(data[val]) + "\n")
+                name = "Price"
+            elif val in not_money:
+                money = False
+
+            if val not in trash_info:
+                response += format_line(name, data[val], money)
 
         bot.send_message(message.chat.id, response)
 
 # Coins list information request
+
+
 def list_request(message):
     request = message.text.split()
     if len(request) < 2 or request[0].lower() not in "list":
@@ -72,20 +85,28 @@ def send_list_info(message):
         response = ""
         for coin in data:
             for val in coin:
-                if val in 'code':
-                    response += ("Name Code: ")
-                if val in 'rate':
-                    response += ("Price: ")
-                if val in 'volume':
-                    response += ("24H Volume: ")
-                if val in 'cap':
-                    response += ("Market Cap: ")
-                response += (format_value(coin[val]) + "\n")
+                name = val.capitalize(), money = True
+                if val in "rate":
+                    name = "Price"
+                elif val in 'code':
+                    name = "Name Code"
+                    money = False
+                elif val in 'volume':
+                    name = "24H Volume"
+                elif val in 'cap':
+                    name = "Market Cap"
+                elif val in not_money:
+                    money = False
+
+                if val not in trash_info:
+                    response += format_line(name, data[val], money)
             response += "\n"
 
         bot.send_message(message.chat.id, response)
 
 # Market overview request
+
+
 def overview_request(message):
     request = message.text.split()
     if len(request) < 1 or request[0].lower() not in "overview":
@@ -102,16 +123,19 @@ def send_overview(message):
     else:
         response = "Market overview.\n"
         for val in data:
+            money = True
+            if val in 'volume':
+                name = "24H Volume"
+            elif val in 'cap':
+                name = "Market Cap"
+            elif val in 'liquidity':
+                name = ("2% liquidity")
+
             if val in 'btcDominance':
                 response += ("BTC Dominance: " +
                              str(millify((data[val] * 100), precision=2) + "%\n"))
-            if val in 'volume':
-                response += ("24H Volume: " + format_value(data[val])+"\n")
-            if val in 'cap':
-                response += ("Market Cap: " + format_value(data[val])+"\n")
-            if val in 'liquidity':
-                response += ("2% liquidity : " +
-                             str(millify((data[val] * 100), precision=2) + "%\n"))    
+            elif val not in trash_info:
+                response += format_line(name, data[val], money)
 
         bot.send_message(message.chat.id, response)
 
@@ -136,7 +160,8 @@ def send_list_ex_info(message):
         for exchange in data:
             for val in exchange:
                 if val in 'markets':
-                    response += val.capitalize() + format_value(exchange[val], True)
+                    response += val.capitalize() + \
+                        format_value(exchange[val], True)
                 else:
                     response += (format_value(coin[val]) + "\n")
             response += "\n"
@@ -145,8 +170,8 @@ def send_list_ex_info(message):
 
 
 # Format value function
-def format_value(val, money):
-    response = ""
+def format_line(name, val, money):
+    response = name + ": "
     if money:
         response = "$"
     if type(val) == int or type(val) == float:
