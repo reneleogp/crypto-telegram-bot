@@ -11,7 +11,7 @@ trash_info = {
 }
 not_money = {
     "pairs",
-    "markets", "exchanges"
+    "markets", "exchanges", "name", "symbol", "code"
 }
 
 # Get help
@@ -53,10 +53,11 @@ def send_coin_info(message):
     else:
         response = ""
         for val in data:
-            name = val.capitalize(), money = True
+            name = val.capitalize()
+            money = True
             if val in "rate":
                 name = "Price"
-            elif val in not_money:
+            if val in not_money:
                 money = False
 
             if val not in trash_info:
@@ -85,21 +86,21 @@ def send_list_info(message):
         response = ""
         for coin in data:
             for val in coin:
-                name = val.capitalize(), money = True
+                name = val.capitalize()
+                money = True
                 if val in "rate":
                     name = "Price"
-                elif val in 'code':
+                if val in 'code':
                     name = "Name Code"
-                    money = False
-                elif val in 'volume':
+                if val in 'volume':
                     name = "24H Volume"
-                elif val in 'cap':
+                if val in 'cap':
                     name = "Market Cap"
-                elif val in not_money:
+                if val in not_money:
                     money = False
 
                 if val not in trash_info:
-                    response += format_line(name, data[val], money)
+                    response += format_line(name, coin[val], money)
             response += "\n"
 
         bot.send_message(message.chat.id, response)
@@ -173,7 +174,7 @@ def send_list_ex_info(message):
 def format_line(name, val, money):
     response = name + ": "
     if money:
-        response = "$"
+        response += "$"
     if type(val) == int or type(val) == float:
         if val < 1:
             response += str(format(val, '.6f'))
