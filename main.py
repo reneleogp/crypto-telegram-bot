@@ -7,11 +7,15 @@ API_KEY = os.environ['API_KEY']
 bot = telebot.TeleBot(API_KEY)
 
 trash_info = {
-    "color", "png32", "png64", "webp32", "webp64", "totalSupply",
+    "color",
+    "png32",
+    "png64",
+    "webp32",
+    "webp64",
+    "totalSupply",
 }
 not_money = {
-    "pairs",
-    "markets", "exchanges", "name", "symbol", "code"
+    "pairs", "markets", "exchanges", "name", "symbol", "code", "visitors"
 }
 
 
@@ -35,7 +39,7 @@ def start(message):
 # Market overview request
 def overview_request(message):
     request = message.text.split()
-    if len(request) < 1 or request[0].lower() not in "overview":
+    if len(request) < 1 or request[0].lower() not in "/overview":
         return False
     else:
         return True
@@ -58,8 +62,9 @@ def send_overview(message):
                 name = ("2% liquidity")
 
             if val in 'btcDominance':
-                response += ("BTC Dominance: " +
-                             str(millify((data[val] * 100), precision=2) + "%\n"))
+                response += (
+                    "BTC Dominance: " +
+                    str(millify((data[val] * 100), precision=2) + "%\n"))
             elif val not in trash_info:
                 response += format_line(name, data[val], money)
 
@@ -139,7 +144,8 @@ def send_list_info(message):
 # Exchanges list information request
 def list_ex_request(message):
     request = message.text.split()
-    if len(request) < 3 or request[0].lower() not in "exchanges" or request[1].lower() not in "list":
+    if len(request) < 3 or request[0].lower(
+    ) not in "exchanges" or request[1].lower() not in "list":
         return False
     else:
         return True
@@ -157,14 +163,14 @@ def send_list_ex_info(message):
             for val in exchange:
                 name = val.capitalize()
                 money = True
-                if val in "rate":
-                    name = "Price"
+              
                 if val in 'code':
                     name = "Name Code"
                 if val in 'volume':
                     name = "24H Volume"
-                if val in 'cap':
-                    name = "Market Cap"
+                if val in "visitors":
+                    name = "Daily Visitors"
+            
                 if val in not_money:
                     money = False
 
