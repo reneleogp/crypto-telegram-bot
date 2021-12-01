@@ -18,7 +18,7 @@ trash_info = {
     "uscompliant"
 }
 not_money = {
-    "pairs", "markets", "exchanges", "name", "symbol", "code", "visitors", "centrilized"
+    "pairs", "markets", "exchanges", "name", "symbol", "code", "visitors", "centralized"
 }
 
 
@@ -42,7 +42,7 @@ def start(message):
 # Market overview request
 def overview_request(message):
     request = message.text.split()
-    if len(request) < 1 or request[0].lower() not in "overview":
+    if len(request) < 1 or request[0].lower() != "overview":
         return False
     else:
         return True
@@ -79,7 +79,7 @@ def send_overview(message):
 def coin_request(message):
     
     request = message.text.split()
-    if len(request) >= 2 and (request[0].lower() in "price" or request[0].lower() in "info"):
+    if len(request) >= 2 and (request[0].lower() == "price" or request[0].lower() == "info"):
         return True
     else:
         return False
@@ -115,7 +115,7 @@ def send_coin_info(message):
 # Coins list information request
 def list_request(message):
     request = message.text.split()
-    if len(request) < 2 or request[0].lower() not in "list":
+    if len(request) < 2 or request[0].lower() != "list":
         return False
     else:
         limit = request[1]
@@ -157,11 +157,11 @@ def send_list_info(message):
 
 
 # Exchanges list information request
-def list_ex_request(message):
+def list_ex_request(message):  
     request = message.text.split()
-    if len(request) < 3 or request[0].lower(
-    ) not in "list" or request[1].lower() not in "exchanges":
+    if len(request) < 3 or request[0].lower() != "list" or (request[1].lower() != "exchanges" and request[1].lower() != "exchange"):
         return False
+        
     else:
         limit = request[2]
         if limit.isnumeric():
@@ -204,7 +204,7 @@ def send_list_ex_info(message):
 # Single exanchange detailed information request
 def exchange_request(message):
     request = message.text.split()
-    if len(request) < 2 or request[0].lower() not in "exchange":
+    if len(request) < 2 or request[0].lower() != "exchange":
         return False
     else:
         return True
@@ -239,7 +239,7 @@ def send_ex_info(message):
         bot.send_message(message.chat.id, response)
 
 
-# Format value function
+# Format line function
 def format_line(name, val, money):
     response = name + ": "
     if money:
