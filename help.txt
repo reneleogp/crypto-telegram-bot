@@ -16,6 +16,7 @@ Example: list 3
 Example: list exchanges 3
 
 - "exchange x" with no quotation marks gets the information about any exchange, where X is the code of the exchange.
-Example: info coinbasepro
+Example: exchange coinbasepro
 
 - "calculate coin x" with no quotation marks calculates the real time value of your crypto. Where coin is the crypto you are holding and x is the amount of crypto you have.
+Example: calculate btc 0.5
