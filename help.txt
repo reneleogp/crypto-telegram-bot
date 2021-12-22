@@ -3,20 +3,20 @@ Commands:
 - "overview" with no quotation marks gets current aggregated data for all coins.
 Example: overview
 
-- "price x" with no quotation marks gets the price of any coin, where X is the code of the coin.
+- "price x" with no quotation marks gets the price of any coin, where `x` is the code of the coin.
 Example: price ETH
 
-- "info x" with no quotation marks gets the information about any coin, where X is the code of the coin.
+- "info x" with no quotation marks gets the information about any coin, where `x` is the code of the coin.
 Example: info BTC
 
-- "list x" with no quotation marks gets basic information about the top x coins.
+- "list x" with no quotation marks gets basic information about the top `x` coins.
 Example: list 3
 
-- "list exchanges x" with no quotation marks gets basic information about the top x exchanges.
+- "list exchanges x" with no quotation marks gets basic information about the top `x` exchanges.
 Example: list exchanges 3
 
-- "exchange x" with no quotation marks gets the information about any exchange, where X is the code of the exchange.
+- "exchange x" with no quotation marks gets the information about any exchange, where `x` is the code of the exchange.
 Example: exchange coinbasepro
 
-- "calculate coin x" with no quotation marks calculates the real time value of your crypto. Where coin is the crypto you are holding and x is the amount of crypto you have.
+- "calculate coin x" with no quotation marks calculates the real time value of your crypto. Where `coin` is the crypto you are holding and `x` is the amount of crypto you have.
 Example: calculate btc 0.5

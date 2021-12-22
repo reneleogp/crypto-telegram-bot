@@ -28,12 +28,11 @@ def info(message):
     f = open("database.json", "r")
     data = json.load(f)
     f.close()
-    
-    data["help"]+=1
+
+    data["help"] += 1
     f = open("database.json", "w")
     json.dump(data, f)
     f.close()
-    
 
 
 # Start message
@@ -47,8 +46,8 @@ def start(message):
     f = open("database.json", "r")
     data = json.load(f)
     f.close()
-    
-    data["users"]+=1
+
+    data["users"] += 1
     f = open("database.json", "w")
     json.dump(data, f)
     f.close()
@@ -282,8 +281,7 @@ def send_value_calculated(message):
     else:
 
         r = ""
-        r += format_line("Coin", coin.upper(), False)
-        r += format_line("Amount", amount, False)
+        r += format_line("Amount", amount, False)[:-1]+ " " + coin.upper() + "\n"
         r += format_line("Price", data['rate'], True)
         r += format_line("Value", data['rate'] * amount, True)
         bot.send_message(message.chat.id, r)
@@ -291,18 +289,13 @@ def send_value_calculated(message):
 
 # Format line function
 def format_line(name, val, money):
-    response = name + ": "
-    if money:
-        response += "$"
-
     if type(val) == int or type(val) == float:
         if val < 1:
-            response += str(format(val, '.6f'))
+            val = format(val, '.6f')
         else:
-            response += str(millify(val, precision=2))
-    else:
-        response += str(val)
-    return response + "\n"
+            val = millify(val, precision=2)
+
+    return "{0}: {1}{2}\n".format(name, "$" if money else "", val)
 
 
 bot.polling()

@@ -9,6 +9,7 @@ python = "^3.8"
 pyTelegramBotAPI = "^4.1.1"
 requests = "^2.26.0"
 millify = "^0.1.1"
+replit = "^3.2.4"
 
 [tool.poetry.dev-dependencies]
 
