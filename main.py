@@ -13,7 +13,7 @@ trash_info = {
 }
 not_money = {
     "pairs", "markets", "exchanges", "name", "symbol", "code", "visitors",
-    "centralized", "circulatingSupply"
+    "centralized", "circulatingSupply", "maxSupply"
 }
 
 
