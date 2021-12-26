@@ -3,8 +3,7 @@ import telebot
 import time
 import other
 import json
-
-
+from millify import millify
 
 API_KEY = os.environ['API_KEY']
 bot = telebot.TeleBot(API_KEY)
@@ -282,13 +281,63 @@ def send_value_calculated(message):
         bot.send_message(message.chat.id, "No data!?")
     else:
         r = ""
-        r += other.format_line("Amount", amount, False)[:-1]+ " " + coin.upper() + "\n"
+        r += other.format_line("Amount", amount,
+                               False)[:-1] + " " + coin.upper() + "\n"
         r += other.format_line("Price", data['rate'], True)
         r += other.format_line("Value", data['rate'] * amount, True)
         bot.send_message(message.chat.id, r)
 
 
+# Get change over time:
+def get_change_request(message):
+    request = message.text.split()
+    if len(request) >= 2 and (request[0].lower() == "change"
+                              or request[0].lower() == "changes"):
+        return True
+    else:
+        return False
 
+
+@bot.message_handler(func=get_change_request)
+def send_change(message):
+    code = message.text.split()[1].upper()
+    data = other.single(code, True)
+
+    if 'error' in data:
+        print(data)
+        bot.send_message(message.chat.id, "No data!?")
+    else:
+        response = "Name: " + data['name'] + "\n"
+        x1 = data['rate']
+        response += other.format_line("Price", x1, True)
+        changes = {}
+
+        t = int(time.time())
+        t *= 1000
+        
+        other.get_change(changes, "1 Year", code)
+        other.get_change(changes, "90 Days", code)
+        other.get_change(changes, "30 Days", code)
+        other.get_change(changes, "7 Days", code)
+        other.get_change(changes, "24 Hours", code)
+        other.get_change(changes, "1 Hour", code)
+
+        for i in changes:
+            x2 = changes[i]
+            if x1 == None or x2 == None:
+              pct = None
+            else:
+              try:
+                  pct = ((x1 - x2) / abs(x2)) * 100
+              except ZeroDivisionError:
+                  pct = None
+
+            if pct != None:
+              pct = round(pct, 2)
+
+            response += str(i) + ": " + str(pct) + "%\n"
+
+        bot.send_message(message.chat.id, response)
 
 
 bot.polling()

@@ -20,3 +20,6 @@ Example: exchange coinbasepro
 
 - "calculate coin x" with no quotation marks calculates the real time value of your crypto. Where `coin` is the crypto you are holding and `x` is the amount of crypto you have.
 Example: calculate btc 0.5
+
+- "change coin" with no quotation gives you the change over time of a `coin`.
+Example: change btc
