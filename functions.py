@@ -1,11 +1,11 @@
 import os
 import requests
 import json
-import math
 import time
 from millify import millify
 
-WEB_API_KEY = os.environ['LCW_API_KEY']
+WEB_API_KEY = os.environ['API_KEY']
+WEB_API_KEY = "8f0fdbde-e942-423f-812c-792638e7b8ab"
 
 dists = {
     "1 Year": 31536000000,

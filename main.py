@@ -1,7 +1,7 @@
 import os
 import telebot
 import time
-import other
+import functions
 import json
 from millify import millify
 
@@ -10,11 +10,11 @@ bot = telebot.TeleBot(API_KEY)
 
 trash_info = {
     "color", "png32", "png64", "webp32", "webp64", "totalSupply", "png128",
-    "webp128", "uscompliant"
+    "webp128", "uscompliant", "categories", "delta", "links"
 }
 not_money = {
     "pairs", "markets", "exchanges", "name", "symbol", "code", "visitors",
-    "centralized", "circulatingSupply", "maxSupply"
+    "centralized", "circulatingSupply", "maxSupply", "rank"
 }
 
 
@@ -65,7 +65,7 @@ def overview_request(message):
 
 @bot.message_handler(func=overview_request)
 def send_overview(message):
-    data = other.overview()
+    data = functions.overview()
     if 'error' in data:
         print(data)
         bot.send_message(message.chat.id, "No data!?")
@@ -85,7 +85,7 @@ def send_overview(message):
                     "BTC Dominance: " +
                     str(millify((data[val] * 100), precision=2) + "%\n"))
             elif val not in trash_info:
-                response += other.format_line(name, data[val], money)
+                response += functions.format_line(name, data[val], money)
 
         bot.send_message(message.chat.id, response)
 
@@ -105,9 +105,9 @@ def coin_request(message):
 def send_coin_info(message):
     coin = message.text.split()[1].upper()
     if message.text.split()[0].lower() in "info":
-        data = other.single(coin, True)
+        data = functions.single(coin, True)
     else:
-        data = other.single(coin, False)
+        data = functions.single(coin, False)
 
     if 'error' in data:
         print(data)
@@ -123,7 +123,7 @@ def send_coin_info(message):
                 money = False
 
             if val not in trash_info:
-                response += other.format_line(name, data[val], money)
+                response += functions.format_line(name, data[val], money)
 
         bot.send_message(message.chat.id, response)
 
@@ -144,7 +144,7 @@ def list_request(message):
 @bot.message_handler(func=list_request)
 def send_list_info(message):
     limit = int(message.text.split()[1])
-    data = other.list(min(limit, 20))
+    data = functions.list(min(limit, 20))
     if 'error' in data:
         print(data)
         bot.send_message(message.chat.id, "No data!?")
@@ -166,7 +166,7 @@ def send_list_info(message):
                     money = False
 
                 if val not in trash_info:
-                    response += other.format_line(name, coin[val], money)
+                    response += functions.format_line(name, coin[val], money)
             response += "\n"
 
         bot.send_message(message.chat.id, response)
@@ -191,7 +191,7 @@ def list_ex_request(message):
 @bot.message_handler(func=list_ex_request)
 def send_list_ex_info(message):
     limit = int(message.text.split()[2])
-    data = other.list_exchanges(min(limit, 15))
+    data = functions.list_exchanges(min(limit, 15))
     if 'error' in data:
         print(data)
         bot.send_message(message.chat.id, "No data!?")
@@ -213,7 +213,8 @@ def send_list_ex_info(message):
                     money = False
 
                 if val not in trash_info:
-                    response += other.format_line(name, exchange[val], money)
+                    response += functions.format_line(name, exchange[val],
+                                                      money)
             response += "\n"
 
         bot.send_message(message.chat.id, response)
@@ -231,7 +232,7 @@ def exchange_request(message):
 @bot.message_handler(func=exchange_request)
 def send_ex_info(message):
     exchange = message.text.split()[1].lower()
-    data = other.single_exchange(exchange)
+    data = functions.single_exchange(exchange)
     if 'error' in data:
         print(data)
         bot.send_message(message.chat.id, "No data!?")
@@ -252,7 +253,7 @@ def send_ex_info(message):
                 money = False
 
             if val.lower() not in trash_info:
-                response += other.format_line(name, data[val], money)
+                response += functions.format_line(name, data[val], money)
 
         bot.send_message(message.chat.id, response)
 
@@ -275,16 +276,16 @@ def calculator_request(message):
 def send_value_calculated(message):
     coin = message.text.split()[1].upper()
     amount = float(message.text.split()[2])
-    data = other.single(coin, False)
+    data = functions.single(coin, False)
     if "error" in data or data['rate'] == None:
         print(data)
         bot.send_message(message.chat.id, "No data!?")
     else:
         r = ""
-        r += other.format_line("Amount", amount,
-                               False)[:-1] + " " + coin.upper() + "\n"
-        r += other.format_line("Price", data['rate'], True)
-        r += other.format_line("Value", data['rate'] * amount, True)
+        r += functions.format_line("Amount", amount,
+                                   False)[:-1] + " " + coin.upper() + "\n"
+        r += functions.format_line("Price", data['rate'], True)
+        r += functions.format_line("Value", data['rate'] * amount, True)
         bot.send_message(message.chat.id, r)
 
 
@@ -301,7 +302,7 @@ def get_change_request(message):
 @bot.message_handler(func=get_change_request)
 def send_change(message):
     code = message.text.split()[1].upper()
-    data = other.single(code, True)
+    data = functions.single(code, True)
 
     if 'error' in data:
         print(data)
@@ -309,31 +310,31 @@ def send_change(message):
     else:
         response = "Name: " + data['name'] + "\n"
         x1 = data['rate']
-        response += other.format_line("Price", x1, True)
+        response += functions.format_line("Price", x1, True)
         changes = {}
 
         t = int(time.time())
         t *= 1000
-        
-        other.get_change(changes, "1 Year", code)
-        other.get_change(changes, "90 Days", code)
-        other.get_change(changes, "30 Days", code)
-        other.get_change(changes, "7 Days", code)
-        other.get_change(changes, "24 Hours", code)
-        other.get_change(changes, "1 Hour", code)
+
+        functions.get_change(changes, "1 Year", code)
+        functions.get_change(changes, "90 Days", code)
+        functions.get_change(changes, "30 Days", code)
+        functions.get_change(changes, "7 Days", code)
+        functions.get_change(changes, "24 Hours", code)
+        functions.get_change(changes, "1 Hour", code)
 
         for i in changes:
             x2 = changes[i]
             if x1 == None or x2 == None:
-              pct = None
+                pct = None
             else:
-              try:
-                  pct = ((x1 - x2) / abs(x2)) * 100
-              except ZeroDivisionError:
-                  pct = None
+                try:
+                    pct = ((x1 - x2) / abs(x2)) * 100
+                except ZeroDivisionError:
+                    pct = None
 
             if pct != None:
-              pct = round(pct, 2)
+                pct = round(pct, 2)
 
             response += str(i) + ": " + str(pct) + "%\n"
 
